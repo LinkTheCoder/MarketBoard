@@ -21,8 +21,8 @@ A full-stack web application built with .NET 8 and Entity Framework Core that al
 - **API Documentation**: Swagger/OpenAPI
 
 ### Frontend (HTML/JavaScript)
-- **Main Page** (`/`): Form for creating advertisements (English interface)
-- **Ads Page** (`/ads.html`): Display published advertisements with filtering (English interface)
+- **Main Page** (`/`): Form for creating advertisements
+- **Ads Page** (`/ads.html`): Display published advertisements with filtering
 - **Real-time Integration**: JavaScript consuming the actual API on port 7043
 
 ## Advertisement System Workflow
