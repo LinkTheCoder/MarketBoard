@@ -78,8 +78,8 @@ The system uses Entity Framework Code First and automatically creates the databa
 
 The system comes with preconfigured test subscribers:
 - **SUB001**: Anna Andersson, Stockholm
-- **SUB002**: Erik Eriksson, Göteborg  
-- **SUB003**: Maria Johansson, Malmö
+- **SUB002**: Erik Eriksson, GÃ¶teborg  
+- **SUB003**: Maria Johansson, MalmÃ¶
 
 ## Running the Application
 
@@ -93,11 +93,3 @@ The system comes with preconfigured test subscribers:
 ## CORS Configuration
 
 The API is configured with CORS to allow calls from the web interface and external systems.
-
-## Recent Changes
-
-- ? Fixed Entity Framework identity column issue
-- ? Added CreateSubscriberDto for secure subscriber creation
-- ? Corrected API URL from port 7200 to 7043 in frontend
-- ? Translated web interface from Swedish to English
-- ? Improved error handling and user feedback
