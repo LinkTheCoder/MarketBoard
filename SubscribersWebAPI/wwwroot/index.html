@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advertisement System - Post an Ad</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .user-type-selection {
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .user-type-selection label {
+            margin: 0 20px;
+            font-weight: bold;
+            cursor: pointer;
+            padding: 10px 20px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            display: inline-block;
+            transition: all 0.3s;
+        }
+
+        .user-type-selection label:hover {
+            background-color: #f0f0f0;
+        }
+
+        .user-type-selection input[type="radio"]:checked + span {
+            background-color: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+
+        .user-type-selection input[type="radio"] {
+            display: none;
+        }
+
+        .form-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #fafafa;
+        }
+
+        .form-section h3 {
+            margin-top: 0;
+            color: #555;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .form-group {
+            flex: 1;
+            margin-bottom: 15px;
+        }
+
+        .form-group.full-width {
+            flex: none;
+            width: 100%;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        input[type="text"],
+        input[type="tel"],
+        input[type="email"],
+        input[type="number"],
+        input[type="date"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            border-color: #007bff;
+            outline: none;
+            box-shadow: 0 0 5px rgba(0,123,255,0.3);
+        }
+
+        .auto-filled {
+            background-color: #e8f5e8 !important;
+            border-color: #4CAF50 !important;
+        }
+
+        .message {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .message.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .message.warning {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        .message.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .loading {
+            color: #007bff;
+            font-style: italic;
+        }
+
+        .submit-section {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        button:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+        }
+
+        .example-numbers {
+            background-color: #e9ecef;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+            font-size: 12px;
+        }
+
+        .price-info {
+            background-color: #d1ecf1;
+            border: 1px solid #bee5eb;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .company-section {
+            display: none;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .api-info {
+            background-color: #e2e3e5;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Post an Advertisement</h1>
+        
+        <div class="api-info">
+            <strong>API Status:</strong> <span id="apiStatus">Checking...</span><br>
+            <strong>API URL:</strong> <span id="apiUrl">https://localhost:7043</span>
+        </div>
+        
+        <form id="advertisementForm">
+            <div class="user-type-selection">
+                <label>
+                    <input type="radio" name="userType" value="1" checked>
+                    <span>👤 Subscriber</span>
+                </label>
+                <label>
+                    <input type="radio" name="userType" value="2">
+                    <span>🏢 Company</span>
+                </label>
+            </div>
+
+            <!-- Subscriber section -->
+            <div id="subscriber-section" class="form-section">
+                <h3>Subscriber Information</h3>
+                <div class="form-group">
+                    <label for="subscriptionNumber">Subscription Number: *</label>
+                    <input type="text" id="subscriptionNumber" placeholder="e.g. SUB001" required>
+                    <div class="example-numbers">
+                        <strong>Test Subscribers:</strong> SUB001, SUB002, SUB003
+                    </div>
+                    <div id="loading" class="loading" style="display: none;">🔄 Fetching information...</div>
+                </div>
+                <div id="subscriberMessage"></div>
+                
+                <div class="price-info">
+                    <strong>🎁 Subscriber Benefit!</strong><br>
+                    As a subscriber, you can post ads completely free!
+                </div>
+            </div>
+
+            <!-- Company section -->
+            <div id="company-section" class="form-section company-section">
+                <h3>Company Information</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="companyName">Company Name: *</label>
+                        <input type="text" id="companyName">
+                    </div>
+                    <div class="form-group">
+                        <label for="orgNumber">Organization Number:</label>
+                        <input type="text" id="orgNumber" placeholder="XXXXXX-XXXX">
+                    </div>
+                </div>
+                
+                <div class="price-info">
+                    <strong>💰 Company Price:</strong><br>
+                    Advertisement price for companies: 40 SEK
+                </div>
+            </div>
+
+            <!-- Contact information -->
+            <div class="form-section">
+                <h3>Contact Information</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="firstName">First Name: *</label>
+                        <input type="text" id="firstName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="lastName">Last Name: *</label>
+                        <input type="text" id="lastName" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="phoneNumber">Phone Number:</label>
+                        <input type="tel" id="phoneNumber" placeholder="070-123 45 67">
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email: *</label>
+                        <input type="email" id="email" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="address">Address: *</label>
+                    <input type="text" id="address" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="postalCode">Postal Code: *</label>
+                        <input type="text" id="postalCode" placeholder="123 45" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="city">City: *</label>
+                        <input type="text" id="city" required>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Advertisement details -->
+            <div class="form-section">
+                <h3>Advertisement Details</h3>
+                <div class="form-group">
+                    <label for="category">Category: *</label>
+                    <select id="category" required>
+                        <option value="">Choose category</option>
+                        <option value="salu">For Sale</option>
+                        <option value="koopes">Wanted</option>
+                        <option value="tjanster">Services</option>
+                        <option value="jobb">Jobs & Career</option>
+                        <option value="fordon">Vehicles</option>
+                        <option value="bostad">Housing</option>
+                        <option value="ovrigt">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="title">Title: *</label>
+                    <input type="text" id="title" placeholder="Write a short title for your ad" required>
+                </div>
+                <div class="form-group">
+                    <label for="content">Advertisement Text: *</label>
+                    <textarea id="content" rows="6" placeholder="Describe your ad here..." required></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="itemPrice">Item Price (SEK):</label>
+                        <input type="number" id="itemPrice" placeholder="0" min="0" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label for="publicationDate">Publication Date:</label>
+                        <input type="date" id="publicationDate" required>
+                    </div>
+                </div>
+            </div>
+
+            <div class="submit-section">
+                <button type="submit" id="submitBtn">Submit</button>
+            </div>
+        </form>
+    </div>
+
+    <script src="announcement-system.js"></script>
+</body>
+</html>

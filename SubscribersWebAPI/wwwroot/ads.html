@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advertisements - View Published Ads</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .nav-links {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .nav-links a {
+            margin: 0 10px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+
+        .nav-links a:hover {
+            background-color: #0056b3;
+        }
+
+        .filters {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .filter-row {
+            display: flex;
+            gap: 15px;
+            align-items: end;
+        }
+
+        .filter-group {
+            flex: 1;
+        }
+
+        .filter-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .filter-group select,
+        .filter-group input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .filter-btn {
+            padding: 8px 15px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .advertisements-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+        }
+
+        .advertisement-card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+
+        .advertisement-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+
+        .ad-header {
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+
+        .ad-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin: 0 0 5px 0;
+        }
+
+        .ad-category {
+            display: inline-block;
+            background-color: #007bff;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+        }
+
+        .ad-price {
+            float: right;
+            font-weight: bold;
+            color: #28a745;
+            font-size: 16px;
+        }
+
+        .ad-content {
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+
+        .ad-footer {
+            border-top: 1px solid #eee;
+            padding-top: 10px;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .advertiser-info {
+            margin-bottom: 5px;
+        }
+
+        .advertiser-type {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        .subscriber {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .company {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .no-ads {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            background-color: white;
+            border-radius: 8px;
+        }
+
+        .api-status {
+            background-color: #e2e3e5;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            font-size: 12px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📰 Published Advertisements</h1>
+        
+        <div class="nav-links">
+            <a href="/">📝 Post Advertisement</a>
+            <a href="/swagger">📖 API Documentation</a>
+        </div>
+
+        <div class="api-status">
+            <strong>API Status:</strong> <span id="apiStatus">Checking...</span>
+        </div>
+    </div>
+
+    <div class="filters">
+        <div class="filter-row">
+            <div class="filter-group">
+                <label for="categoryFilter">Category:</label>
+                <select id="categoryFilter">
+                    <option value="">All categories</option>
+                    <option value="salu">For Sale</option>
+                    <option value="koopes">Wanted</option>
+                    <option value="tjanster">Services</option>
+                    <option value="jobb">Jobs & Career</option>
+                    <option value="fordon">Vehicles</option>
+                    <option value="bostad">Housing</option>
+                    <option value="ovrigt">Other</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="searchFilter">Search:</label>
+                <input type="text" id="searchFilter" placeholder="Search in title or content...">
+            </div>
+            <div class="filter-group">
+                <label for="advertiserFilter">Advertiser:</label>
+                <select id="advertiserFilter">
+                    <option value="">All</option>
+                    <option value="1">Subscribers</option>
+                    <option value="2">Companies</option>
+                </select>
+            </div>
+            <button class="filter-btn" onclick="advertisementViewer.applyFilters()">Filter</button>
+        </div>
+    </div>
+
+    <div id="loading" class="loading">🔄 Loading advertisements...</div>
+    <div id="advertisementsContainer" class="advertisements-grid"></div>
+
+    <script>
+        class AdvertisementViewer {
+            constructor() {
+                this.apiBaseUrl = 'https://localhost:7043/api';
+                this.allAdvertisements = [];
+                this.filteredAdvertisements = [];
+                this.checkApiStatus();
+                this.loadAdvertisements();
+            }
+
+            async checkApiStatus() {
+                const statusElement = document.getElementById('apiStatus');
+                try {
+                    const response = await fetch(`${this.apiBaseUrl}/advertisements`);
+                    if (response.ok) {
+                        statusElement.innerHTML = '<span style="color: green;">✓ Connected</span>';
+                    } else {
+                        statusElement.innerHTML = '<span style="color: red;">⚠ API Error</span>';
+                    }
+                } catch (error) {
+                    statusElement.innerHTML = '<span style="color: red;">✗ Not Connected</span>';
+                    console.error('API connection failed:', error);
+                }
+            }
+
+            async loadAdvertisements() {
+                try {
+                    const response = await fetch(`${this.apiBaseUrl}/advertisements/published`);
+                    if (response.ok) {
+                        this.allAdvertisements = await response.json();
+                        this.filteredAdvertisements = [...this.allAdvertisements];
+                        this.displayAdvertisements();
+                    } else {
+                        this.showError('Could not load advertisements');
+                    }
+                } catch (error) {
+                    console.error('Error loading advertisements:', error);
+                    this.showError('Could not connect to the API');
+                } finally {
+                    document.getElementById('loading').style.display = 'none';
+                }
+            }
+
+            applyFilters() {
+                const categoryFilter = document.getElementById('categoryFilter').value;
+                const searchFilter = document.getElementById('searchFilter').value.toLowerCase();
+                const advertiserFilter = document.getElementById('advertiserFilter').value;
+
+                this.filteredAdvertisements = this.allAdvertisements.filter(ad => {
+                    const matchesCategory = !categoryFilter || ad.category === categoryFilter;
+                    const matchesSearch = !searchFilter || 
+                        ad.title.toLowerCase().includes(searchFilter) ||
+                        ad.content.toLowerCase().includes(searchFilter);
+                    const matchesAdvertiser = !advertiserFilter || ad.advertiserType.toString() === advertiserFilter;
+
+                    return matchesCategory && matchesSearch && matchesAdvertiser;
+                });
+
+                this.displayAdvertisements();
+            }
+
+            displayAdvertisements() {
+                const container = document.getElementById('advertisementsContainer');
+                
+                if (this.filteredAdvertisements.length === 0) {
+                    container.innerHTML = '<div class="no-ads">No advertisements found with current filters.</div>';
+                    return;
+                }
+
+                container.innerHTML = this.filteredAdvertisements.map(ad => this.renderAdvertisement(ad)).join('');
+            }
+
+            renderAdvertisement(ad) {
+                const categoryNames = {
+                    'salu': 'For Sale',
+                    'koopes': 'Wanted',
+                    'tjanster': 'Services',
+                    'jobb': 'Jobs & Career',
+                    'fordon': 'Vehicles',
+                    'bostad': 'Housing',
+                    'ovrigt': 'Other'
+                };
+
+                const advertiserTypeClass = ad.advertiserType === 1 ? 'subscriber' : 'company';
+                const advertiserTypeName = ad.advertiserType === 1 ? 'Subscriber' : 'Company';
+                const advertiserName = ad.advertiserType === 1 ? ad.fullName : ad.companyName;
+                
+                const price = ad.itemPrice > 0 ? `${ad.itemPrice} kr` : 'Price on request';
+                
+                const publicationDate = new Date(ad.publicationDate).toLocaleDateString('en-US');
+
+                return `
+                    <div class="advertisement-card">
+                        <div class="ad-header">
+                            <div class="ad-title">${ad.title}</div>
+                            <span class="ad-category">${categoryNames[ad.category] || ad.category}</span>
+                            <span class="ad-price">${price}</span>
+                            <div style="clear: both;"></div>
+                        </div>
+                        
+                        <div class="ad-content">
+                            ${ad.content}
+                        </div>
+                        
+                        <div class="ad-footer">
+                            <div class="advertiser-info">
+                                <strong>${advertiserName}</strong>
+                                <span class="advertiser-type ${advertiserTypeClass}">${advertiserTypeName}</span>
+                            </div>
+                            <div>📞 ${ad.phoneNumber || 'Not provided'}</div>
+                            <div>📧 ${ad.email}</div>
+                            <div>📍 ${ad.fullAddress}</div>
+                            <div>📅 Published: ${publicationDate}</div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            showError(message) {
+                const container = document.getElementById('advertisementsContainer');
+                container.innerHTML = `<div class="no-ads">❌ ${message}</div>`;
+            }
+        }
+
+        // Start the viewer when the page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            window.advertisementViewer = new AdvertisementViewer();
+        });
+    </script>
+</body>
+</html>
